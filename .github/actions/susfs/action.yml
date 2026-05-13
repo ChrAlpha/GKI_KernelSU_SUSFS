@@ -241,7 +241,13 @@ runs:
         fi
         if [ "${{ inputs.sublevel }}" -ge "157" ]; then
           echo "Reverting namespace.c Android 14 6.1 Fake Patch"
-          sed -i '/^#include "internal.h"$/a #include <trace/hooks/blk.h>' fs/namespace.c
+          if [ -f include/trace/hooks/blk.h ]; then
+            if ! grep -qxF '#include <trace/hooks/blk.h>' fs/namespace.c; then
+              sed -i '/^#include "internal.h"$/a #include <trace/hooks/blk.h>' fs/namespace.c
+            fi
+          else
+            echo "Skipping blk.h re-add: include/trace/hooks/blk.h not present"
+          fi
         fi
 
     - name: Revert Android 15 6.6 Fake Patches

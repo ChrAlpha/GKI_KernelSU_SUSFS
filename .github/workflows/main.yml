@@ -57,6 +57,18 @@ on:
         description: "Use repo for downloading kernel source"
         type: boolean
         default: true
+      single_sublevel:
+        description: "Only build this sublevel (e.g. 157)"
+        type: string
+        required: false
+      single_os_patch_level:
+        description: "Only build this OS patch level (e.g. 2025-12)"
+        type: string
+        required: false
+      manifest_url:
+        description: "Optional manifest URL override (e.g. manifest_14791245.xml link)"
+        type: string
+        required: false
 
 jobs:
   build-a12-5-10:
@@ -67,6 +79,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   build-a13-5-10:
@@ -77,6 +92,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   build-a13-5-15:
@@ -87,6 +105,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   build-a14-5-15:
@@ -97,6 +118,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   build-a14-6-1:
@@ -107,6 +131,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   build-a15-6-6:
@@ -117,6 +144,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   build-a16-6-12:
@@ -127,6 +157,9 @@ jobs:
       feature_set: ${{ inputs.feature_set || 'FULL' }}
       variant: ${{ inputs.variant || 'Normal' }}
       use_repo: ${{ inputs.use_repo }}
+      single_sublevel: ${{ inputs.single_sublevel }}
+      single_os_patch_level: ${{ inputs.single_os_patch_level }}
+      manifest_url: ${{ inputs.manifest_url }}
     secrets: inherit
 
   rej:

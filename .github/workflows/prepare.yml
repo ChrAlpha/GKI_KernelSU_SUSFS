@@ -20,6 +20,18 @@ on:
         required: false
         type: boolean
         default: false
+      single_sublevel:
+        description: "Only build this sublevel"
+        required: false
+        type: string
+      single_os_patch_level:
+        description: "Only build this OS patch level"
+        required: false
+        type: string
+      manifest_url:
+        description: "Optional manifest URL override"
+        required: false
+        type: string
 
 jobs:
   generate-matrix:
@@ -39,7 +51,30 @@ jobs:
             exit 1
           fi
 
+          if { [ -n "${{ inputs.single_sublevel }}" ] && [ -z "${{ inputs.single_os_patch_level }}" ]; } || \
+             { [ -z "${{ inputs.single_sublevel }}" ] && [ -n "${{ inputs.single_os_patch_level }}" ]; }; then
+            echo "Error: single_sublevel and single_os_patch_level must be provided together"
+            exit 1
+          fi
+
           CONFIG_JSON=$(cat "${{ inputs.config_file }}" | jq -c .)
+          MANIFEST_URL="${{ inputs.manifest_url }}"
+
+          if [ -n "${{ inputs.single_sublevel }}" ] && [ -n "${{ inputs.single_os_patch_level }}" ]; then
+            FILTERED=$(echo "$CONFIG_JSON" | jq -c \
+              --arg sub "${{ inputs.single_sublevel }}" \
+              --arg date "${{ inputs.single_os_patch_level }}" \
+              '.include = [ .include[] | select(.sublevel == $sub and .date == $date) ]')
+
+            MATCH_COUNT=$(echo "$FILTERED" | jq '.include | length')
+            if [ "$MATCH_COUNT" -eq 0 ]; then
+              echo "Error: No matching entry in config for sublevel=${{ inputs.single_sublevel }}, date=${{ inputs.single_os_patch_level }}"
+              exit 1
+            fi
+
+            CONFIG_JSON="$FILTERED"
+            echo "Single-build mode enabled: sublevel=${{ inputs.single_sublevel }}, date=${{ inputs.single_os_patch_level }}"
+          fi
 
           # Build the variant list as a JSON array
           if [ "${{ inputs.variant }}" = "All" ] || [ -z "${{ inputs.variant }}" ]; then
@@ -51,6 +86,7 @@ jobs:
           # Build { "include": [ {android_version:..., kernel_version:..., sublevel:..., os_patch_level:..., variant: ...}, ... ] }
           FINAL=$(jq -cn \
             --argjson cfg "$CONFIG_JSON" \
+            --arg manifest_url "$MANIFEST_URL" \
             --argjson variants "$VARIANTS" '
             ($cfg.version | split("-")) as $version_parts
             | {
@@ -64,7 +100,8 @@ jobs:
                       kernel_version: $version_parts[1],
                       sublevel: $item.sublevel,
                       os_patch_level: $item.date,
-                      variant: $build_variant
+                      variant: $build_variant,
+                      manifest_url: $manifest_url
                     }
                 ]
                 + [
@@ -76,7 +113,8 @@ jobs:
                       kernel_version: $version_parts[1],
                       sublevel: $item.sublevel,
                       os_patch_level: $item.date,
-                      variant: $item.variant
+                      variant: $item.variant,
+                      manifest_url: $manifest_url
                     }
                 ]
                 | unique_by([.android_version, .kernel_version, .sublevel, .os_patch_level, .variant])
@@ -100,4 +138,5 @@ jobs:
       variant: ${{ matrix.variant }}
       feature_set: ${{ inputs.feature_set }}
       use_repo: ${{ inputs.use_repo }}
+      manifest_url: ${{ matrix.manifest_url }}
     secrets: inherit

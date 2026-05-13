@@ -30,6 +30,9 @@ on:
       use_repo:
         required: false
         type: boolean
+      manifest_url:
+        required: false
+        type: string
 
 jobs:
   build-gki:
@@ -75,6 +78,7 @@ jobs:
         kernel_version: ${{ inputs.kernel_version }}
         os_patch_level: ${{ inputs.os_patch_level }}
         use_repo: ${{ inputs.use_repo }}
+        manifest_url: ${{ inputs.manifest_url }}
 
     - name: Extract Sublevel and Set File Name
       id: extract
